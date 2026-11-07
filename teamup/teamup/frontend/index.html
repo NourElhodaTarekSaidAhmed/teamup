@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teamup — find your project team</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6fa;--surface:#fff;--ink:#14202e;--muted:#5c6b7d;--line:#d5dde8;--blue:#1f4fd8;--blue-d:#173caa;--green:#0e8f6b;--green-bg:#dff5ec;--amber:#b36b00;--red:#b3261e}
+@media(prefers-color-scheme:dark){:root{--bg:#0f1722;--surface:#18222f;--ink:#e8eef6;--muted:#9aa9bb;--line:#2a3849;--blue:#6f93ff;--blue-d:#9bb4ff;--green:#3fd1a1;--green-bg:#123a30;--amber:#e0a23a;--red:#ff8a80}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+a{color:inherit;text-decoration:none}
+h1{font-size:2rem;line-height:1.15;margin:0 0 .4rem;letter-spacing:-.02em}
+h2{font-size:1.2rem;margin:0 0 .75rem}h3{font-size:1.05rem;margin:0 0 .25rem}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+header{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header .wrap{display:flex;align-items:center;gap:20px;min-height:56px;flex-wrap:wrap}
+.logo{font-weight:700;font-size:1.15rem;letter-spacing:-.02em;color:var(--blue)}
+nav{display:flex;gap:4px;flex:1;flex-wrap:wrap}
+nav a{padding:6px 12px;border-radius:6px;color:var(--muted);font-weight:500}
+nav a.on,nav a:hover{background:var(--bg);color:var(--ink)}
+main{padding:28px 0 60px}
+.sub{color:var(--muted);margin:0 0 22px;max-width:60ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+a.card:hover{border-color:var(--blue)}
+.card img{width:100%;height:130px;object-fit:cover;display:block}
+.cb{padding:14px 16px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:18px;margin-bottom:16px}
+.meta{color:var(--muted);font-size:.9rem;margin:0 0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.82rem;padding:2px 10px;border-radius:99px;border:1px solid var(--line);color:var(--muted);background:var(--bg)}
+.chip.on{background:var(--green-bg);border-color:var(--green);color:var(--green);font-weight:600}
+.cover{margin-top:12px}
+.bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--green)}
+.cover small{color:var(--muted)}
+.cover b{color:var(--green)}
+label{display:block;font-weight:500;margin:12px 0 4px;font-size:.92rem}
+input,textarea,select{width:100%;font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+input:focus,textarea:focus,select:focus,button:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:1px}
+textarea{min-height:90px;resize:vertical}
+.row{display:flex;gap:12px}.row>*{flex:1}
+button,.btn{font:inherit;font-weight:600;border:1px solid var(--blue);background:var(--blue);color:#fff;border-radius:6px;padding:8px 16px;cursor:pointer}
+button:hover{background:var(--blue-d)}
+button.ghost{background:transparent;color:var(--blue)}
+button.ghost:hover{background:var(--bg)}
+button.small{padding:4px 10px;font-size:.88rem}
+.bar-form{display:flex;gap:10px;margin-bottom:20px}.bar-form input{flex:1}.bar-form input:last-of-type{max-width:180px}
+.two{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;align-items:start}
+@media(max-width:800px){.two,.row{display:block}.row>*{margin-bottom:8px}}
+.auth{max-width:380px;margin:60px auto}
+.err{color:var(--red);min-height:1.4em;font-size:.92rem;margin:8px 0 0}
+.task{display:grid;grid-template-columns:1fr 130px 110px;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.task.done .t{text-decoration:line-through;color:var(--muted)}
+.task small{color:var(--muted)}
+.chat{height:340px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding:4px 2px 10px}
+.msg{max-width:82%;background:var(--bg);border-radius:8px;padding:6px 10px}
+.msg.me{align-self:flex-end;background:var(--blue);color:#fff}
+.msg small{display:block;opacity:.7;font-size:.76rem}
+.empty{color:var(--muted);padding:24px;border:1px dashed var(--line);border-radius:8px;text-align:center}
+.toast{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:20}
+.toast div{background:var(--ink);color:var(--bg);padding:10px 14px;border-radius:8px;max-width:320px}
+.badge{display:inline-block;font-size:.8rem;padding:1px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--muted)}
+ul.plain{list-style:none;margin:0;padding:0}ul.plain li{padding:6px 0;border-top:1px solid var(--line)}ul.plain li:first-child{border:0}
+</style>
+</head>
+<body>
+<header><div class="wrap"><a class="logo" href="#/">Teamup</a><nav id="nav"></nav><span id="who"></span></div></header>
+<main><div class="wrap" id="app"></div></main>
+<div class="toast" id="toast"></div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const app = document.getElementById('app');
+let token = localStorage.getItem('t'), me = null, socket = null, cur = { pid: null };
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+const csv = s => s.split(',').map(x => x.trim()).filter(Boolean);
+const chips = (skills, have = []) => skills.map(s => `<span class="chip ${have.some(h => h.toLowerCase() === s.toLowerCase()) ? 'on' : ''}">${esc(s)}</span>`).join('');
+const time = d => new Date(d).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+function toast(text) {
+  const el = document.createElement('div'); el.textContent = text;
+  document.getElementById('toast').append(el); setTimeout(() => el.remove(), 5000);
+}
+
+async function api(path, { method = 'GET', body, headers = {} } = {}) {
+  if (token) headers.Authorization = 'Bearer ' + token;
+  if (body && !(body instanceof FormData)) { headers['Content-Type'] = 'application/json'; body = JSON.stringify(body); }
+  const r = await fetch('/api' + path, { method, headers, body });
+  const data = await r.json().catch(() => ({}));
+  if (r.status === 401 && token) { logout(); throw new Error(data.error); }
+  if (!r.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+function logout() { localStorage.removeItem('t'); token = me = null; socket?.close(); socket = null; route(); }
+
+function connect() {
+  socket = io({ auth: { token } });
+  socket.on('chat', m => { if (m.projectId === cur.pid) addMsg(m); });
+  socket.on('tasks:changed', () => cur.pid && location.hash.startsWith('#/project/') && projectView(cur.pid, true));
+  socket.on('files:changed', () => cur.pid && location.hash.startsWith('#/project/') && projectView(cur.pid, true));
+  socket.on('request:new', d => toast(`New join request for “${d.project}”.`));
+  socket.on('request:update', d => toast(d.accepted ? 'Your join request was accepted. You are on the team.' : 'A join request was declined.'));
+  socket.on('reminder', t => toast(`Due soon: “${t.title}” in ${t.project}.`));
+}
+
+function setNav(page) {
+  const links = [['matches','For you'],['projects','Browse'],['mine','My teams'],['requests','Requests'],['new','Post a project'],['profile','Profile']];
+  document.getElementById('nav').innerHTML = me ? links.map(([h, l]) => `<a href="#/${h}" class="${page === h ? 'on' : ''}">${l}</a>`).join('') : '';
+  document.getElementById('who').innerHTML = me ? `<button class="ghost small" id="out">Sign out</button>` : '';
+  document.getElementById('out')?.addEventListener('click', logout);
+}
+
+function onSubmit(sel, fn) {
+  document.querySelector(sel).addEventListener('submit', async e => {
+    e.preventDefault();
+    const err = e.target.querySelector('.err');
+    try { await fn(new FormData(e.target), e.target); } catch (x) { if (err) err.textContent = x.message; else toast(x.message); }
+  });
+}
+
+/* ---------- views ---------- */
+function authView() {
+  setNav();
+  app.innerHTML = `<div class="panel auth"><h1>Find your project team</h1>
+    <p class="sub">Add your skills, and Teamup shows the projects that need them.</p>
+    <form id="f"><div id="nm"></div><label>Email</label><input name="email" type="email" required autocomplete="email">
+    <label>Password</label><input name="password" type="password" required minlength="6" autocomplete="current-password">
+    <p class="err"></p><button style="width:100%">Sign in</button></form>
+    <p class="meta" style="margin-top:14px"><a href="#" id="sw" style="color:var(--blue)">New here? Create an account</a></p></div>`;
+  let reg = false;
+  document.getElementById('sw').onclick = e => {
+    e.preventDefault(); reg = !reg;
+    document.getElementById('nm').innerHTML = reg ? '<label>Full name</label><input name="name" required autocomplete="name">' : '';
+    document.querySelector('#f button').textContent = reg ? 'Create account' : 'Sign in';
+    e.target.textContent = reg ? 'Have an account? Sign in' : 'New here? Create an account';
+  };
+  onSubmit('#f', async fd => {
+    const out = await api(reg ? '/auth/register' : '/auth/login', { method: 'POST', body: Object.fromEntries(fd) });
+    token = out.token; localStorage.setItem('t', token); location.hash = '#/profile'; route();
+  });
+}
+
+const card = p => `<a class="card" href="#/project/${p.id}">${p.image_key ? `<img src="/api/files/${esc(p.image_key)}" alt="">` : ''}
+  <div class="cb"><h3>${esc(p.title)}</h3><p class="meta">${esc(p.course || 'No course set')}. Posted by ${esc(p.owner_name)}. ${p.member_count} of ${p.team_size} places filled.</p>
+  <div class="chips">${chips(p.skills, me.skills)}</div>
+  ${p.score != null ? `<div class="cover"><div class="bar"><i style="width:${p.score}%"></i></div><small><b>${p.matched_skills.length} of ${p.skills.length}</b> required skills are yours</small></div>` : ''}</div></a>`;
+
+async function matchesView() {
+  setNav('matches');
+  const list = await api('/matches');
+  app.innerHTML = `<h1>Projects that need your skills</h1><p class="sub">Ranked by how many of a project’s required skills you already have.</p>` +
+    (!me.skills.length ? `<div class="empty">You have not added any skills yet. <a href="#/profile" style="color:var(--blue)">Add your skills</a> to see matches.</div>`
+      : list.length ? `<div class="grid">${list.map(card).join('')}</div>`
+      : `<div class="empty">Nothing matches yet. <a href="#/projects" style="color:var(--blue)">Browse all open projects</a> or check back soon.</div>`);
+}
+
+async function projectsView() {
+  setNav('projects');
+  app.innerHTML = `<h1>Open projects</h1><p class="sub">Search by title, course or required skill.</p>
+    <form class="bar-form" id="s"><input name="q" placeholder="Search projects"><input name="skill" placeholder="Skill, e.g. React"><button>Search</button></form><div id="res"></div>`;
+  const load = async (q = '', skill = '') => {
+    const list = await api(`/projects?q=${encodeURIComponent(q)}&skill=${encodeURIComponent(skill)}`);
+    document.getElementById('res').innerHTML = list.length ? `<div class="grid">${list.map(card).join('')}</div>` : `<div class="empty">No open projects found. Try a different search.</div>`;
+  };
+  onSubmit('#s', fd => load(fd.get('q'), fd.get('skill')));
+  load();
+}
+
+function newView() {
+  setNav('new');
+  app.innerHTML = `<h1>Post a project</h1><p class="sub">Describe what you are building and the skills your team still needs.</p>
+    <form class="panel" id="f" style="max-width:640px"><label>Title</label><input name="title" required>
+    <div class="row"><div><label>Course</label><input name="course" placeholder="e.g. CS301 Web Engineering"></div>
+    <div><label>Team size (including you)</label><input name="team_size" type="number" min="2" max="12" value="4"></div></div>
+    <label>Description</label><textarea name="description"></textarea>
+    <label>Required skills (comma separated)</label><input name="skills" placeholder="Python, React, UI/UX">
+    <div class="row"><div><label>Deadline</label><input name="deadline" type="date"></div><div><label>Cover image</label><input name="image" type="file" accept="image/*"></div></div>
+    <p class="err"></p><button>Post project</button></form>`;
+  onSubmit('#f', async fd => {
+    if (!fd.get('image').size) fd.delete('image');
+    const { id } = await api('/projects', { method: 'POST', body: fd });
+    location.hash = '#/project/' + id;
+  });
+}
+
+async function mineView() {
+  setNav('mine');
+  const list = await api('/my/projects');
+  app.innerHTML = `<h1>My teams</h1><p class="sub">Projects you own or have joined, with task progress.</p>` +
+    (list.length ? `<div class="grid">${list.map(p => `<a class="card" href="#/project/${p.id}"><div class="cb"><h3>${esc(p.title)}</h3>
+      <p class="meta">${p.role === 'owner' ? 'You own this project' : 'Member'}. ${p.member_count} of ${p.team_size} places filled.</p>
+      <span class="badge">${p.progress.startsWith('0/0') ? 'No tasks yet' : p.progress + ' tasks done'}</span></div></a>`).join('')}</div>`
+      : `<div class="empty">You are not on a team yet. <a href="#/matches" style="color:var(--blue)">See projects that fit your skills</a>.</div>`);
+}
+
+async function requestsView() {
+  setNav('requests');
+  const list = await api('/requests/incoming');
+  app.innerHTML = `<h1>Join requests</h1><p class="sub">People who want to join projects you own.</p>` +
+    (list.length ? list.map(r => `<div class="panel"><h3>${esc(r.name)} wants to join “${esc(r.title)}”</h3>
+      <p class="meta">${esc(r.major || 'Major not set')}</p><div class="chips" style="margin-bottom:10px">${chips(r.skills)}</div>
+      ${r.message ? `<p>${esc(r.message)}</p>` : ''}
+      <button class="small" data-a="accept" data-id="${r.id}">Accept</button> <button class="small ghost" data-a="reject" data-id="${r.id}">Decline</button></div>`).join('')
+      : `<div class="empty">No pending requests.</div>`);
+  app.querySelectorAll('[data-a]').forEach(b => b.onclick = async () => {
+    await api(`/requests/${b.dataset.id}/${b.dataset.a}`, { method: 'POST' }); requestsView();
+  });
+}
+
+function profileView() {
+  setNav('profile');
+  app.innerHTML = `<h1>Your profile</h1><p class="sub">Teams see this when you ask to join, and matching uses your skills.</p>
+    <form class="panel" id="f" style="max-width:640px"><label>Name</label><input name="name" value="${esc(me.name)}" required>
+    <label>Major</label><input name="major" value="${esc(me.major)}">
+    <label>Bio</label><textarea name="bio">${esc(me.bio)}</textarea>
+    <label>Skills (comma separated)</label><input name="skills" value="${esc(me.skills.join(', '))}" placeholder="Python, React, UI/UX">
+    <p class="err"></p><button>Save profile</button></form>`;
+  onSubmit('#f', async fd => {
+    await api('/me', { method: 'PUT', body: { name: fd.get('name'), major: fd.get('major'), bio: fd.get('bio'), skills: csv(fd.get('skills')) } });
+    me = await api('/me'); toast('Profile saved.'); setNav('profile');
+  });
+}
+
+function addMsg(m) {
+  const box = document.getElementById('chat'); if (!box) return;
+  const el = document.createElement('div');
+  el.className = 'msg' + (m.user_id === me.id ? ' me' : '');
+  el.innerHTML = `<small>${esc(m.name)}, ${time(m.created_at)}</small>${esc(m.body)}`;
+  box.append(el); box.scrollTop = box.scrollHeight;
+}
+
+async function projectView(id, refresh) {
+  setNav('');
+  const p = await api('/projects/' + id);
+  cur.pid = +id;
+  const head = `<h1>${esc(p.title)}</h1><p class="meta">${esc(p.course || 'No course set')}. Posted by ${esc(p.owner_name)}${p.deadline ? `. Due ${esc(p.deadline)}` : ''}.</p>`;
+  const people = `<div class="panel"><h2>Team (${p.member_count} of ${p.team_size})</h2><ul class="plain">${p.members.map(m => `<li>${esc(m.name)} ${m.role === 'owner' ? '<span class="badge">owner</span>' : ''}</li>`).join('')}</ul></div>`;
+  const needs = `<div class="panel"><h2>Skills needed</h2><div class="chips">${chips(p.skills, me.skills)}</div></div>`;
+
+  if (!p.is_member) {
+    app.innerHTML = head + `<div class="two"><div>${p.image_key ? `<img src="/api/files/${esc(p.image_key)}" alt="" style="width:100%;max-height:260px;object-fit:cover;border-radius:8px;margin-bottom:16px">` : ''}
+      <div class="panel"><h2>About this project</h2><p style="white-space:pre-wrap">${esc(p.description) || 'No description yet.'}</p></div></div>
+      <div>${needs}${people}<div class="panel"><h2>Join this team</h2>${p.my_request === 'pending' ? '<p>Your request is waiting for the owner.</p>' :
+      p.status !== 'open' ? '<p>This team is full.</p>' : `<form id="j"><label>Message to the owner</label><textarea name="message" placeholder="What can you contribute?"></textarea><p class="err"></p><button>Send join request</button></form>`}</div></div></div>`;
+    document.getElementById('j') && onSubmit('#j', async fd => { await api(`/projects/${id}/join`, { method: 'POST', body: { message: fd.get('message') } }); toast('Request sent.'); projectView(id); });
+    return;
+  }
+
+  const done = p.tasks.filter(t => t.status === 'done').length, pct = p.tasks.length ? Math.round(100 * done / p.tasks.length) : 0;
+  const opts = (sel) => `<option value="">Unassigned</option>` + p.members.map(m => `<option value="${m.id}" ${m.id === sel ? 'selected' : ''}>${esc(m.name)}</option>`).join('');
+  const chatDraft = document.getElementById('cm')?.value || '';
+  app.innerHTML = head + `<div class="two"><div>
+    <div class="panel"><h2>Tasks</h2><div class="bar"><i style="width:${pct}%"></i></div><p class="meta">${done} of ${p.tasks.length} done</p>
+      ${p.tasks.map(t => `<div class="task ${t.status}"><div><span class="t">${esc(t.title)}</span>${t.due_date ? `<br><small>Due ${esc(t.due_date)}</small>` : ''}</div>
+        <select data-t="${t.id}" data-f="assignee_id" aria-label="Assignee">${opts(t.assignee_id)}</select>
+        <select data-t="${t.id}" data-f="status" aria-label="Status">${['todo','doing','done'].map(s => `<option ${s === t.status ? 'selected' : ''}>${s}</option>`).join('')}</select></div>`).join('') || '<div class="empty">No tasks yet. Add the first one below.</div>'}
+      <form id="tf" class="row" style="margin-top:12px;align-items:end"><div style="flex:2"><input name="title" placeholder="New task" required></div>
+        <div><select name="assignee_id">${opts()}</select></div><div><input name="due_date" type="date"></div><div style="flex:0"><button>Add</button></div></form></div>
+    <div class="panel"><h2>Files</h2><ul class="plain">${p.files.map(f => `<li><a style="color:var(--blue)" href="/api/files/${esc(f.key)}" target="_blank" rel="noopener">${esc(f.name)}</a></li>`).join('') || '<li class="meta">No files yet.</li>'}</ul>
+      <form id="ff" style="margin-top:10px"><input type="file" name="file" required><p class="err"></p><button class="small" style="margin-top:8px">Upload file</button></form></div></div>
+    <div>${needs}${people}<div class="panel"><h2>Team chat</h2><div class="chat" id="chat"></div>
+      <form id="cf" class="row"><input id="cm" autocomplete="off" placeholder="Message your team" value="${esc(chatDraft)}"><div style="flex:0"><button>Send</button></div></form></div></div></div>`;
+
+  p.messages.forEach(addMsg);
+  if (!refresh) socket.emit('project:join', +id); else socket.emit('project:join', +id);
+  app.querySelectorAll('select[data-t]').forEach(s => s.onchange = () =>
+    api('/tasks/' + s.dataset.t, { method: 'PATCH', body: { [s.dataset.f]: s.value } }).catch(e => toast(e.message)));
+  onSubmit('#tf', async (fd, f) => { await api(`/projects/${id}/tasks`, { method: 'POST', body: Object.fromEntries(fd) }); });
+  onSubmit('#ff', async fd => { await api(`/projects/${id}/files`, { method: 'POST', body: fd }); });
+  onSubmit('#cf', async () => {
+    const i = document.getElementById('cm'); if (!i.value.trim()) return;
+    socket.emit('chat', { projectId: +id, body: i.value }); i.value = '';
+  });
+}
+
+/* ---------- router ---------- */
+async function route() {
+  if (!token) return authView();
+  try {
+    if (!me) { me = await api('/me'); connect(); }
+    const [, page, arg] = location.hash.split('/');
+    const views = { matches: matchesView, projects: projectsView, mine: mineView, new: newView, requests: requestsView, profile: profileView, project: () => projectView(arg) };
+    cur.pid = null;
+    await (views[page] || matchesView)();
+  } catch (e) { toast(e.message); }
+}
+addEventListener('hashchange', route);
+route();
+</script>
+</body>
+</html>
