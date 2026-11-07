@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: teamup
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-teamup_pw}
+      POSTGRES_DB: teamup
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U teamup"]
+      interval: 5s
+      retries: 10
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASSWORD:-minioadmin123}
+    volumes:
+      - miniodata:/data
+    ports:
+      - "9001:9001"
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgres://teamup:${DB_PASSWORD:-teamup_pw}@postgres:5432/teamup
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      MINIO_ENDPOINT: minio
+      MINIO_USER: ${MINIO_USER:-minioadmin}
+      MINIO_PASSWORD: ${MINIO_PASSWORD:-minioadmin123}
+      MINIO_BUCKET: teamup
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+  nginx:
+    image: nginx:alpine
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend:/usr/share/nginx/html:ro
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+volumes:
+  pgdata:
+  miniodata:
